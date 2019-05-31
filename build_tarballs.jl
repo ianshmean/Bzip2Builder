@@ -24,7 +24,7 @@ make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}" CFLAGS="${CFLAGS}" LDFLAGS="${LDFL
 
 # Build dynamic library
 if [[ "${target}" == *-darwin* ]]; then
-    $CC -shared -o libbz2.1.0.6.dylib $LDFLAGS $OBJS
+    $CC -shared -current_version 1.0.6 -compatibility_version 1.0 -o libbz2.1.0.6.dylib $LDFLAGS $OBJS
     ln -s libbz2.1.0.6.dylib libbz2.1.0.dylib
     ln -s libbz2.1.0.6.dylib libbz2.1.dylib
     ln -s libbz2.1.0.6.dylib libbz2.dylib
@@ -40,6 +40,24 @@ else
     ln -s libbz2.so.1.0.6 libbz2.so
     mv libbz2.so* ${prefix}/lib/
 fi
+
+# Add pkg-config file
+mkdir -p ${prefix}/lib/pkgconfig
+cat << EOF > $prefix/lib/pkgconfig/bzip2.pc
+prefix=${prefix}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+sharedlibdir=\${libdir}
+includedir=\${prefix}/include
+
+Name: bzip2
+Description: bzip2 compression library
+Version: 1.0.6
+
+Requires:
+Libs: -L\${libdir} -L\${sharedlibdir} -lbz2
+Cflags: -I\${includedir}
+EOF
 """
 
 # These are the platforms we will build for by default, unless further
